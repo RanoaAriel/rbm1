@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBM Inventory Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            overflow-y: scroll;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #1abc9c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+
+        body {
+
+            background-color:rgb(3, 3, 48);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            
+        }
+
+        .logo {
+            height: 70px;
+            margin-right: 30px;
+            
+        }
+
+        .header-text {
+            flex-grow: 1;
+            
+        }
+
+        .container-fluid {
+            padding: 20px;
+            
+           
+        }
+
+        .search-box {
+            width: 300px;
+            
+        }
+
+        .table th {
+            white-space: nowrap;
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+            
+            
+        }
+
+        /* Enhanced Status Colors */
+        .status-active {
+            color: var(--success-color);
+            font-weight: bold;
+            background-color: rgba(39, 174, 96, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            
+
+        }
+
+        .status-inactive {
+            color: var(--danger-color);
+            font-weight: bold;
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+
+        }
+
+        .status-maintenance {
+            color: var(--warning-color);
+            font-weight: bold;
+            background-color: rgba(243, 156, 18, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            
+        }
+
+        .status-retired {
+            color: #95a5a6;
+            font-weight: bold;
+            background-color: rgba(149, 165, 166, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-disposed {
+            color: #7f8c8d;
+            font-weight: bold;
+            background-color: rgba(127, 140, 141, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            text-decoration: line-through;
+        }
+
+        /* Unique Approval Status Colors */
+        .status-pending {
+            color: var(--warning-color);
+            font-weight: bold;
+            background-color: rgba(243, 156, 18, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            
+            display: inline-block;
+        }
+
+        .status-approved {
+            color: var(--info-color);
+            font-weight: bold;
+            background-color: rgba(26, 188, 156, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-disapproved {
+            color: var(--danger-color);
+            font-weight: bold;
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Enhanced Action Buttons */
+        .action-buttons .btn {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.875rem;
+            margin-right: 5px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: none;
+        }
+
+        .action-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Unique Approval Buttons */
+        .btn-approve {
+            background-color: var(--info-color);
+            color: white;
+            
+        }
+
+        .btn-approve:hover {
+            background-color: #16a085;
+            color: white;
+        }
+
+        .btn-disapprove {
+            background-color: var(--danger-color);
+            color: white;
+            
+        }
+
+        .btn-disapprove:hover {
+            background-color: #c0392b;
+            color: white;
+            
+        
+            
+        }
+
+        .btn-restore {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-restore:hover {
+            background-color: #d35400;
+            color: white;
+            
+        }
+
+        .btn-edit {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #e67e22;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        .btn-print {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background-color: #219653;
+            color: white;
+        }
+
+        .btn-dispose {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+        .btn-dispose:hover {
+            background-color: #5d6d6e;
+            color: white;
+        }
+
+        .btn-add {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+        }
+
+        .btn-add:hover {
+            background-color: #2980b9;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-add i {
+            font-size: 1.2rem;
+        }
+
+        /* Custom icons */
+        .custom-icon {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        
+        .add-icon {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .edit-icon {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        /* Folder Tabs */
+        .folder-tabs {
+            margin-bottom: 20px;
+            border-bottom: none;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #495057;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 8px 8px 0 0;
+            margin-right: 8px;
+            background-color: #e9ecef;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #ffffff;
+            background-color: var(--primary-color);
+            border-bottom: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            
+            
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            background-color: #dee2e6;
+            color: #212529;
+        }
+
+        .folder-content {
+            display: none;
+        }
+
+        .folder-content.active {
+            display: block;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .no-print, .action-buttons {
+                display: none !important;
+            }
+            .table {
+                width: 100% !important;
+                font-size: 12px;
+                
+            }
+            .table th, .table td {
+                padding: 4px 8px;
+                overflow-y: scroll;
+
+                
+                
+            }
+            .print-header {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .print-header h2 {
+                margin: 0;
+                font-size: 18px;
+                color: var(--primary-color);
+            }
+            .print-header p {
+                margin: 5px 0 0;
+                font-size: 12px;
+                color: #666;
+            }
+            .print-logo {
+                height: 50px;
+                margin-bottom: 10px;
+            }
+            .print-footer {
+                text-align: right;
+                margin-top: 15px;
+                font-size: 10px;
+                color: #666;
+            }
+            .status-active, .status-inactive, .status-maintenance,
+            .status-retired, .status-disposed, .status-pending,
+            .status-approved, .status-disapproved {
+                background-color: transparent !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .d-flex {
+                flex-direction: column;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                
+
+
+            }
+            
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Table Navigation Bar */
+.table-navbar {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Navigation Controls */
+.table-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Page Info */
+.page-info {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0 15px;
+}
+
+/* Navigation Buttons */
+.nav-btn {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+}
+
+.nav-btn:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.nav-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+}
+
+.nav-btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* Page Size Selector */
+.page-size-selector {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    color: #495057;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.page-size-selector:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Search Box */
+.table-search {
+    position: relative;
+    margin-right: 10px;
+}
+
+.table-search input {
+    padding: 6px 12px 6px 32px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    width: 200px;
+    transition: all 0.2s ease;
+}
+
+.table-search input:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.table-search i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+/* Filter Dropdown */
+.filter-dropdown {
+    position: relative;
+    margin-right: 10px;
+}
+
+.filter-btn {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.filter-btn:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.filter-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+    display: none;
+}
+
+.filter-menu.show {
+    display: block;
+}
+
+.filter-option {
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+}
+
+.filter-option input {
+    margin-right: 8px;
+}
+
+/* Export Buttons */
+.export-btn {
+    background-color: #198754;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 10px;
+}
+
+.export-btn:hover {
+    background-color: #157347;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .table-navbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .table-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .table-search input {
+        width: 100%;
+    }
+    
+    .filter-dropdown {
+        width: 100%;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filter-menu {
+        width: 100%;
+    }
+}
+
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header with Logo -->
+        <div class="header-container no-print">
+            <img src="RBM.png" alt="RBM Logo" class="logo">
+            <div class="header-text">
+                <h1 class="mb-0">RBM Inventory Management System</h1>
+                <p class="mb-0 text-muted">Track and manage all your equipment in one place</p>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-4 no-print">
+            <div class="search-box">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search equipment...">
+                </div>
+            </div>
+            <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                <span class="custom-icon add-icon"><i class="bi bi-plus-lg"></i></span>
+                Add New Item
+            </button>
+        </div>
+
+        <!-- Folder Tabs -->
+        <ul class="nav nav-tabs folder-tabs no-print" id="folderTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                    <i class="bi bi-grid"></i> All Items
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    <i class="bi bi-hourglass"></i> Pending Approval
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
+                    <i class="bi bi-check-circle"></i> Approved
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="disapproved-tab" data-bs-toggle="tab" data-bs-target="#disapproved" type="button" role="tab">
+                    <i class="bi bi-x-circle"></i> Disapproved
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="still-in-use-tab" data-bs-toggle="tab" data-bs-target="#still-in-use" type="button" role="tab">
+                    <i class="bi bi-pc-display"></i> Active
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="disposed-tab" data-bs-toggle="tab" data-bs-target="#disposed" type="button" role="tab">
+                    <i class="bi bi-trash"></i> Disposed
+                </button>
+            </li>
+        </ul>
+
+        <!-- Folder Contents -->
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="all">
+                        <i class="bi bi-printer"></i> Print All Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printAll">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Status</th>
+                                <th>Approval Status</th>
+                                <th>Action Date</th>
+                                <th>Approval Date</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allItemsTableBody">
+                            <!-- All items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pending" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="pending">
+                        <i class="bi bi-printer"></i> Print Pending Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printPending">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Status</th>
+                                <th>Action Date</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody">
+                            <!-- Pending items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="approved" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="approved">
+                        <i class="bi bi-printer"></i> Print Approved Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printApproved">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Status</th>
+                                <th>Approval Date</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvedTableBody">
+                            <!-- Approved items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="disapproved" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="disapproved">
+                        <i class="bi bi-printer"></i> Print Disapproved Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printDisapproved">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Status</th>
+                                <th>Disapproval Date</th>
+                                <th>Reason</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disapprovedTableBody">
+                            <!-- Disapproved items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="still-in-use" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="still-in-use">
+                        <i class="bi bi-printer"></i> Print Still in Use Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printStillInUse">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Status</th>
+                                <th>Approval Status</th>
+                                <th>Action Date</th>
+                                <th>Approval Date</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stillInUseTableBody">
+                            <!-- Still in use items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="disposed" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2 no-print">
+                    <button class="btn btn-print print-btn" data-target="disposed">
+                        <i class="bi bi-printer"></i> Print Disposed Items
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover print-section" id="printDisposed">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipment Type</th>
+                                <th>Serial Number</th>
+                                <th>Branch</th>
+                                <th>Model</th>
+                                <th>Brand</th>
+                                <th>Department</th>
+                                <th>Inventory Date</th>
+                                <th>Disposal Date</th>
+                                <th>Disposal Reason</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disposedTableBody">
+                            <!-- Disposed items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addItemModalLabel">
+                        <span class="custom-icon add-icon"><i class="bi bi-plus-lg"></i></span>
+                        Add New Item
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addItemForm">
+                        <div class="mb-3">
+                            <label for="equipmentType" class="form-label">Equipment Type</label>
+                            <select class="form-select" id="equipmentType" required>
+                                <option value="">Select Equipment Type</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Desktop">Desktop</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Server">Server</option>
+                                <option value="Network Device">Network Device</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Other">mouse</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="serialNumber" class="form-label">Serial Number</label>
+                            <input type="text" class="form-control" id="serialNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="branch" class="form-label">Branch</label>
+                            <select class="form-select" id="branch" required>
+                                <option value="">Select Branch</option>
+                                <option value="Main">Main</option>
+                                <option value="North">North</option>
+                                <option value="South">South</option>
+                                <option value="East">East</option>
+                                <option value="West">West</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="model" class="form-label">Model</label>
+                            <input type="text" class="form-control" id="model" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="brand" class="form-label">Brand</label>
+                            <input type="text" class="form-control" id="brand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inventoryDate" class="form-label">Inventory Date</label>
+                            <input type="date" class="form-control" id="inventoryDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Retired">Retired</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveItemBtn">
+                        <span class="custom-icon add-icon"><i class="bi bi-plus-lg"></i></span>
+                        Save Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="editItemModalLabel">
+                        <span class="custom-icon edit-icon"><i class="bi bi-pencil"></i></span>
+                        Edit Item
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editItemForm">
+                        <input type="hidden" id="editId">
+                        <div class="mb-3">
+                            <label for="editEquipmentType" class="form-label">Equipment Type</label>
+                            <select class="form-select" id="editEquipmentType" required>
+                                <option value="">Select Equipment Type</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Desktop">Desktop</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Server">Server</option>
+                                <option value="Network Device">Network Device</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSerialNumber" class="form-label">Serial Number</label>
+                            <input type="text" class="form-control" id="editSerialNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editBranch" class="form-label">Branch</label>
+                            <select class="form-select" id="editBranch" required>
+                                <option value="">Select Branch</option>
+                                <option value="Main">Main</option>
+                                <option value="North">North</option>
+                                <option value="South">South</option>
+                                <option value="East">East</option>
+                                <option value="West">West</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editModel" class="form-label">Model</label>
+                            <input type="text" class="form-control" id="editModel" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editBrand" class="form-label">Brand</label>
+                            <input type="text" class="form-control" id="editBrand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDepartment" class="form-label">Department</label>
+                            <select class="form-select" id="editDepartment" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editInventoryDate" class="form-label">Inventory Date</label>
+                            <input type="date" class="form-control" id="editInventoryDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Status</label>
+                            <select class="form-select" id="editStatus" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Retired">Retired</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" id="updateItemBtn">
+                        <span class="custom-icon edit-icon"><i class="bi bi-pencil"></i></span>
+                        Update Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Modal -->
+    <div class="modal fade" id="approvalModal" tabindex="-1" aria-labelledby="approvalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="approvalModalLabel">Approve/Disapprove Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="approvalForm">
+                        <input type="hidden" id="approvalItemId">
+                        <div class="mb-3">
+                            <label class="form-label">Action</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalAction" id="approveRadio" value="approve" checked>
+                                <label class="form-check-label" for="approveRadio">
+                                    Approve
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalAction" id="disapproveRadio" value="disapprove">
+                                <label class="form-check-label" for="disapproveRadio">
+                                    Disapprove
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3" id="reasonField" style="display: none;">
+                            <label for="disapprovalReason" class="form-label">Reason for Disapproval</label>
+                            <textarea class="form-control" id="disapprovalReason" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info" id="submitApprovalBtn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Confirmation Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="restoreModalLabel">Restore to Pending</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to restore this item to pending status?</p>
+                    <input type="hidden" id="restoreItemId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="confirmRestoreBtn">Confirm Restore</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispose Confirmation Modal -->
+    <div class="modal fade" id="disposeModal" tabindex="-1" aria-labelledby="disposeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="disposeModalLabel">Dispose Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="disposeForm">
+                        <input type="hidden" id="disposeItemId">
+                        <div class="mb-3">
+                            <label for="disposalReason" class="form-label">Reason for Disposal</label>
+                            <textarea class="form-control" id="disposalReason" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-dark" id="confirmDisposeBtn">Confirm Dispose</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to permanently delete this item? This action cannot be undone.</p>
+                    <input type="hidden" id="deleteItemId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Permanently</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize inventory data
+            let inventoryData = [
+                {
+                    id: 1,
+                    equipmentType: 'Laptop',
+                    serialNumber: 'SN001',
+                    branch: 'Main',
+                    model: 'XPS 15',
+                    brand: 'Dell',
+                    department: 'IT',
+                    inventoryDate: '2023-01-15',
+                    status: 'Active',
+                    approvalStatus: 'approved',
+                    actionDate: '2023-01-20',
+                    approvalDate: '2023-01-21',
+                    disapprovalReason: '',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 2,
+                    equipmentType: 'Printer',
+                    serialNumber: 'SN002',
+                    branch: 'North',
+                    model: 'LaserJet Pro',
+                    brand: 'HP',
+                    department: 'Marketing',
+                    inventoryDate: '2023-02-10',
+                    status: 'Active',
+                    approvalStatus: 'disapproved',
+                    actionDate: '2023-02-15',
+                    disapprovalDate: '2023-02-16',
+                    disapprovalReason: 'Budget constraints',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 3,
+                    equipmentType: 'Desktop',
+                    serialNumber: 'SN003',
+                    branch: 'South',
+                    model: 'ThinkPad X1',
+                    brand: 'Lenovo',
+                    department: 'Finance',
+                    inventoryDate: '2023-03-05',
+                    status: 'Inactive',
+                    approvalStatus: 'pending',
+                    actionDate: '2023-03-10',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 4,
+                    equipmentType: 'Printer',
+                    serialNumber: 'SN004',
+                    branch: 'East',
+                    model: 'Color LaserJet',
+                    brand: 'HP',
+                    department: 'HR',
+                    inventoryDate: '2023-04-01',
+                    status: 'Active',
+                    approvalStatus: 'pending',
+                    actionDate: '2023-04-05',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 5,
+                    equipmentType: 'Printer',
+                    serialNumber: 'SN005',
+                    branch: 'West',
+                    model: 'WorkForce Pro',
+                    brand: 'Epson',
+                    department: 'Operations',
+                    inventoryDate: '2023-05-12',
+                    status: 'Maintenance',
+                    approvalStatus: 'approved',
+                    actionDate: '2023-05-15',
+                    approvalDate: '2023-05-16',
+                    disapprovalReason: '',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 6,
+                    equipmentType: 'Monitor',
+                    serialNumber: 'SN006',
+                    branch: 'Main',
+                    model: 'UltraSharp 27',
+                    brand: 'Dell',
+                    department: 'IT',
+                    inventoryDate: '2022-11-20',
+                    status: 'Disposed',
+                    approvalStatus: 'approved',
+                    actionDate: '2022-11-25',
+                    approvalDate: '2022-11-26',
+                    disapprovalReason: '',
+                    disposed: true,
+                    disposalDate: '2023-06-10',
+                    disposalReason: 'Obsolete technology'
+                },
+                {
+                    id: 7,
+                    equipmentType: 'Laptop',
+                    serialNumber: 'SN007',
+                    branch: 'Main',
+                    model: 'MacBook Pro',
+                    brand: 'Apple',
+                    department: 'IT',
+                    inventoryDate: '2023-06-15',
+                    status: 'Active',
+                    approvalStatus: 'approved',
+                    actionDate: '2023-06-20',
+                    approvalDate: '2023-06-21',
+                    disapprovalReason: '',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                },
+                {
+                    id: 8,
+                    equipmentType: 'Server',
+                    serialNumber: 'SN008',
+                    branch: 'Main',
+                    model: 'PowerEdge R750',
+                    brand: 'Dell',
+                    department: 'IT',
+                    inventoryDate: '2023-01-10',
+                    status: 'Active',
+                    approvalStatus: 'approved',
+                    actionDate: '2023-01-15',
+                    approvalDate: '2023-01-16',
+                    disapprovalReason: '',
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                }
+            ];
+
+            // DOM elements
+            const allItemsTableBody = document.getElementById('allItemsTableBody');
+            const pendingTableBody = document.getElementById('pendingTableBody');
+            const approvedTableBody = document.getElementById('approvedTableBody');
+            const disapprovedTableBody = document.getElementById('disapprovedTableBody');
+            const stillInUseTableBody = document.getElementById('stillInUseTableBody');
+            const disposedTableBody = document.getElementById('disposedTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const saveItemBtn = document.getElementById('saveItemBtn');
+            const updateItemBtn = document.getElementById('updateItemBtn');
+            const submitApprovalBtn = document.getElementById('submitApprovalBtn');
+            const confirmRestoreBtn = document.getElementById('confirmRestoreBtn');
+            const confirmDisposeBtn = document.getElementById('confirmDisposeBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const addItemForm = document.getElementById('addItemForm');
+            const editItemForm = document.getElementById('editItemForm');
+            const approvalForm = document.getElementById('approvalForm');
+            const disposeForm = document.getElementById('disposeForm');
+            
+            // Modal elements
+            const addItemModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+            const editItemModal = new bootstrap.Modal(document.getElementById('editItemModal'));
+            const approvalModal = new bootstrap.Modal(document.getElementById('approvalModal'));
+            const restoreModal = new bootstrap.Modal(document.getElementById('restoreModal'));
+            const disposeModal = new bootstrap.Modal(document.getElementById('disposeModal'));
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+            // Toggle reason field based on approval action
+            document.querySelectorAll('input[name="approvalAction"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('reasonField').style.display = 
+                        this.value === 'disapprove' ? 'block' : 'none';
+                });
+            });
+
+            // Render all inventory tables
+            function renderAllTables(data = inventoryData) {
+                renderInventoryTable(data);
+                renderPendingTable(data);
+                renderApprovedTable(data);
+                renderDisapprovedTable(data);
+                renderStillInUseTable(data);
+                renderDisposedTable(data);
+            }
+            
+            // Render main inventory table
+            function renderInventoryTable(data = inventoryData) {
+                allItemsTableBody.innerHTML = '';
+                
+                data.forEach(item => {
+                    if (item.disposed) return; // Skip disposed items in main table
+                    
+                    const row = document.createElement('tr');
+                    
+                    // Determine status class
+                    let statusClass = '';
+                    switch(item.status) {
+                        case 'Active':
+                            statusClass = 'status-active';
+                            break;
+                        case 'Inactive':
+                            statusClass = 'status-inactive';
+                            break;
+                        case 'Maintenance':
+                            statusClass = 'status-maintenance';
+                            break;
+                        case 'Retired':
+                            statusClass = 'status-retired';
+                            break;
+                        case 'Disposed':
+                            statusClass = 'status-disposed';
+                            break;
+                    }
+                    
+                    // Determine approval status class
+                    let approvalStatusClass = '';
+                    switch(item.approvalStatus) {
+                        case 'approved':
+                            approvalStatusClass = 'status-approved';
+                            break;
+                        case 'disapproved':
+                            approvalStatusClass = 'status-disapproved';
+                            break;
+                        case 'pending':
+                            approvalStatusClass = 'status-pending';
+                            break;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td><span class="${statusClass}">${item.status}</span></td>
+                        <td><span class="${approvalStatusClass}">${item.approvalStatus.charAt(0).toUpperCase() + item.approvalStatus.slice(1)}</span></td>
+                        <td>${item.actionDate}</td>
+                        <td>${item.approvalDate || item.disapprovalDate || 'N/A'}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-edit edit-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            ${item.approvalStatus === 'pending' ? 
+                                `<button class="btn btn-approve approval-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Approve/Disapprove">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>` : ''}
+                            ${item.approvalStatus !== 'pending' ? 
+                                `<button class="btn btn-restore restore-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Restore to Pending">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>` : ''}
+                            <button class="btn btn-dispose dispose-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Dispose Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    allItemsTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Render pending approval table
+            function renderPendingTable(data = inventoryData) {
+                pendingTableBody.innerHTML = '';
+                
+                const pendingItems = data.filter(item => item.approvalStatus === 'pending' && !item.disposed);
+                
+                pendingItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = '';
+                    switch(item.status) {
+                        case 'Active':
+                            statusClass = 'status-active';
+                            break;
+                        case 'Inactive':
+                            statusClass = 'status-inactive';
+                            break;
+                        case 'Maintenance':
+                            statusClass = 'status-maintenance';
+                            break;
+                        case 'Retired':
+                            statusClass = 'status-retired';
+                            break;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td><span class="${statusClass}">${item.status}</span></td>
+                        <td>${item.actionDate}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-edit edit-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-approve approval-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Approve/Disapprove">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                            <button class="btn btn-dispose dispose-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Dispose Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    pendingTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Render approved items table
+            function renderApprovedTable(data = inventoryData) {
+                approvedTableBody.innerHTML = '';
+                
+                const approvedItems = data.filter(item => item.approvalStatus === 'approved' && !item.disposed);
+                
+                approvedItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = '';
+                    switch(item.status) {
+                        case 'Active':
+                            statusClass = 'status-active';
+                            break;
+                        case 'Inactive':
+                            statusClass = 'status-inactive';
+                            break;
+                        case 'Maintenance':
+                            statusClass = 'status-maintenance';
+                            break;
+                        case 'Retired':
+                            statusClass = 'status-retired';
+                            break;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td><span class="${statusClass}">${item.status}</span></td>
+                        <td>${item.approvalDate}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-edit edit-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-restore restore-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Restore to Pending">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-dispose dispose-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Dispose Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    approvedTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Render disapproved items table
+            function renderDisapprovedTable(data = inventoryData) {
+                disapprovedTableBody.innerHTML = '';
+                
+                const disapprovedItems = data.filter(item => item.approvalStatus === 'disapproved' && !item.disposed);
+                
+                disapprovedItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = '';
+                    switch(item.status) {
+                        case 'Active':
+                            statusClass = 'status-active';
+                            break;
+                        case 'Inactive':
+                            statusClass = 'status-inactive';
+                            break;
+                        case 'Maintenance':
+                            statusClass = 'status-maintenance';
+                            break;
+                        case 'Retired':
+                            statusClass = 'status-retired';
+                            break;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td><span class="${statusClass}">${item.status}</span></td>
+                        <td>${item.disapprovalDate}</td>
+                        <td>${item.disapprovalReason}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-edit edit-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-restore restore-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Restore to Pending">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-dispose dispose-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Dispose Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    disapprovedTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Render still in use items table
+            function renderStillInUseTable(data = inventoryData) {
+                stillInUseTableBody.innerHTML = '';
+                
+                const stillInUseItems = data.filter(item => 
+                    !item.disposed && 
+                    item.approvalStatus === 'approved' && 
+                    (item.status === 'Active' || item.status === 'Maintenance')
+                );
+                
+                stillInUseItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = '';
+                    switch(item.status) {
+                        case 'Active':
+                            statusClass = 'status-active';
+                            break;
+                        case 'Maintenance':
+                            statusClass = 'status-maintenance';
+                            break;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td><span class="${statusClass}">${item.status}</span></td>
+                        <td><span class="status-approved">Approved</span></td>
+                        <td>${item.actionDate}</td>
+                        <td>${item.approvalDate}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-edit edit-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-restore restore-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Restore to Pending">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-dispose dispose-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Dispose Item">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    stillInUseTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Render disposed items table
+            function renderDisposedTable(data = inventoryData) {
+                disposedTableBody.innerHTML = '';
+                
+                const disposedItems = data.filter(item => item.disposed);
+                
+                disposedItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.equipmentType}</td>
+                        <td>${item.serialNumber}</td>
+                        <td>${item.branch}</td>
+                        <td>${item.model}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.department}</td>
+                        <td>${item.inventoryDate}</td>
+                        <td>${item.disposalDate}</td>
+                        <td>${item.disposalReason}</td>
+                        <td class="action-buttons no-print">
+                            <button class="btn btn-restore restore-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Restore to Inventory">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-delete delete-btn" data-id="${item.id}" data-bs-toggle="tooltip" title="Delete Permanently">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    disposedTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                addButtonEventListeners();
+            }
+            
+            // Add event listeners to all buttons
+            function addButtonEventListeners() {
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', handleEdit);
+                });
+                
+                document.querySelectorAll('.approval-btn').forEach(btn => {
+                    btn.addEventListener('click', handleApproval);
+                });
+                
+                document.querySelectorAll('.restore-btn').forEach(btn => {
+                    btn.addEventListener('click', handleRestore);
+                });
+                
+                document.querySelectorAll('.dispose-btn').forEach(btn => {
+                    btn.addEventListener('click', handleDispose);
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', handleDelete);
+                });
+                
+                document.querySelectorAll('.print-btn').forEach(btn => {
+                    btn.addEventListener('click', handlePrint);
+                });
+                
+                // Initialize tooltips
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+            
+            // Handle edit button click
+            function handleEdit(e) {
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
+                const item = inventoryData.find(item => item.id === itemId);
+                
+                if (item) {
+                    // Populate edit form
+                    document.getElementById('editId').value = item.id;
+                    document.getElementById('editEquipmentType').value = item.equipmentType;
+                    document.getElementById('editSerialNumber').value = item.serialNumber;
+                    document.getElementById('editBranch').value = item.branch;
+                    document.getElementById('editModel').value = item.model;
+                    document.getElementById('editBrand').value = item.brand;
+                    document.getElementById('editDepartment').value = item.department;
+                    document.getElementById('editInventoryDate').value = item.inventoryDate;
+                    document.getElementById('editStatus').value = item.status;
+                    
+                    // Show edit modal
+                    editItemModal.show();
+                }
+            }
+            
+            // Handle approval button click
+            function handleApproval(e) {
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
+                document.getElementById('approvalItemId').value = itemId;
+                document.getElementById('reasonField').style.display = 'none';
+                document.getElementById('disapprovalReason').value = '';
+                approvalModal.show();
+            }
+            
+            // Handle restore button click
+            function handleRestore(e) {
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
+                document.getElementById('restoreItemId').value = itemId;
+                restoreModal.show();
+            }
+            
+            // Handle dispose button click
+            function handleDispose(e) {
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
+                document.getElementById('disposeItemId').value = itemId;
+                document.getElementById('disposalReason').value = '';
+                disposeModal.show();
+            }
+            
+            // Handle delete button click
+            function handleDelete(e) {
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
+                document.getElementById('deleteItemId').value = itemId;
+                deleteModal.show();
+            }
+            
+            // Handle print button click
+            function handlePrint(e) {
+                const target = e.currentTarget.getAttribute('data-target');
+                const tableId = `print${target.charAt(0).toUpperCase() + target.slice(1).replace(/-([a-z])/g, (g) => g[1].toUpperCase())}`;
+                const table = document.getElementById(tableId);
+                
+                // Create a new window for printing
+                const printWindow = window.open('', '', 'height=600,width=800');
+                
+                // Get current date for print footer
+                const today = new Date();
+                const dateStr = today.toLocaleDateString();
+                const timeStr = today.toLocaleTimeString();
+                
+                // Create print content
+                let title = 'All Inventory Items';
+                if (target === 'pending') title = 'Pending Approval Items';
+                else if (target === 'approved') title = 'Approved Items';
+                else if (target === 'disapproved') title = 'Disapproved Items';
+                else if (target === 'still-in-use') title = 'Still in Use Items';
+                else if (target === 'disposed') title = 'Disposed Items';
+                
+                // Clone the table to modify for printing
+                const tableClone = table.cloneNode(true);
+                
+                // Remove action columns from the clone
+                const actionColumns = tableClone.querySelectorAll('.no-print, .action-buttons');
+                actionColumns.forEach(col => col.remove());
+                
+                // Create the print document
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>RBM Inventory - ${title}</title>
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                    margin: 20px;
+                                }
+                                .print-header {
+                                    text-align: center;
+                                    margin-bottom: 20px;
+                                }
+                                .print-header h2 {
+                                    margin: 0;
+                                    color: #2c3e50;
+                                }
+                                .print-header p {
+                                    margin: 5px 0 0;
+                                    color: #666;
+                                }
+                                .print-logo {
+                                    height: 50px;
+                                    margin-bottom: 10px;
+                                }
+                                table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin-bottom: 20px;
+                                }
+                                th {
+                                    background-color: #2c3e50;
+                                    color: white;
+                                    padding: 8px;
+                                    text-align: left;
+                                }
+                                td {
+                                    padding: 6px;
+                                    border-bottom: 1px solid #ddd;
+                                }
+                                .status-active {
+                                    color: #27ae60;
+                                    font-weight: bold;
+                                }
+                                .status-inactive {
+                                    color: #e74c3c;
+                                    font-weight: bold;
+                                }
+                                .status-maintenance {
+                                    color: #f39c12;
+                                    font-weight: bold;
+                                }
+                                .status-retired {
+                                    color: #95a5a6;
+                                    font-weight: bold;
+                                }
+                                .status-disposed {
+                                    color: #7f8c8d;
+                                    font-weight: bold;
+                                    text-decoration: line-through;
+                                }
+                                .status-pending {
+                                    color: #f39c12;
+                                    font-weight: bold;
+                                }
+                                .status-approved {
+                                    color: #1abc9c;
+                                    font-weight: bold;
+                                }
+                                .status-disapproved {
+                                    color: #e74c3c;
+                                    font-weight: bold;
+                                }
+                                .print-footer {
+                                    text-align: right;
+                                    margin-top: 20px;
+                                    font-size: 12px;
+                                    color: #666;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="print-header">
+                                <img src="rbm.png" class="print-logo" alt="RBM Logo">
+                                <h2>RBM Inventory Management System</h2>
+                                <p>${title}</p>
+                            </div>
+                            ${tableClone.outerHTML}
+                            <div class="print-footer">
+                                Printed on ${dateStr} at ${timeStr}
+                            </div>
+                        </body>
+                    </html>
+                `);
+                
+                printWindow.document.close();
+                
+                // Wait for content to load before printing
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500);
+            }
+            
+            // Handle save new item
+            saveItemBtn.addEventListener('click', function() {
+                if (!addItemForm.checkValidity()) {
+                    addItemForm.reportValidity();
+                    return;
+                }
+                
+                const newId = inventoryData.length > 0 ? Math.max(...inventoryData.map(item => item.id)) + 1 : 1;
+                const today = new Date().toISOString().split('T')[0];
+                
+                const newItem = {
+                    id: newId,
+                    equipmentType: document.getElementById('equipmentType').value,
+                    serialNumber: document.getElementById('serialNumber').value,
+                    branch: document.getElementById('branch').value,
+                    model: document.getElementById('model').value,
+                    brand: document.getElementById('brand').value,
+                    department: document.getElementById('department').value,
+                    inventoryDate: document.getElementById('inventoryDate').value,
+                    status: document.getElementById('status').value,
+                    approvalStatus: 'pending',
+                    actionDate: today,
+                    disposed: false,
+                    disposalDate: '',
+                    disposalReason: ''
+                };
+                
+                inventoryData.push(newItem);
+                renderAllTables();
+                
+                // Reset and close modal
+                addItemForm.reset();
+                addItemModal.hide();
+                
+                // Show success message
+                alert('Item added successfully and is pending approval');
+            });
+            
+            // Handle update item
+            updateItemBtn.addEventListener('click', function() {
+                if (!editItemForm.checkValidity()) {
+                    editItemForm.reportValidity();
+                    return;
+                }
+                
+                const itemId = parseInt(document.getElementById('editId').value);
+                const today = new Date().toISOString().split('T')[0];
+                
+                const updatedItem = {
+                    id: itemId,
+                    equipmentType: document.getElementById('editEquipmentType').value,
+                    serialNumber: document.getElementById('editSerialNumber').value,
+                    branch: document.getElementById('editBranch').value,
+                    model: document.getElementById('editModel').value,
+                    brand: document.getElementById('editBrand').value,
+                    department: document.getElementById('editDepartment').value,
+                    inventoryDate: document.getElementById('editInventoryDate').value,
+                    status: document.getElementById('editStatus').value,
+                    actionDate: today,
+                    // Preserve other properties
+                    ...inventoryData.find(item => item.id === itemId)
+                };
+                
+                const index = inventoryData.findIndex(item => item.id === itemId);
+                if (index !== -1) {
+                    inventoryData[index] = updatedItem;
+                    renderAllTables();
+                    
+                    // Close modal
+                    editItemModal.hide();
+                    
+                    // Show success message
+                    alert('Item updated successfully');
+                }
+            });
+            
+            // Handle approval submission
+            submitApprovalBtn.addEventListener('click', function() {
+                const itemId = parseInt(document.getElementById('approvalItemId').value);
+                const action = document.querySelector('input[name="approvalAction"]:checked').value;
+                const today = new Date().toISOString().split('T')[0];
+                
+                const index = inventoryData.findIndex(item => item.id === itemId);
+                if (index !== -1) {
+                    if (action === 'approve') {
+                        inventoryData[index].approvalStatus = 'approved';
+                        inventoryData[index].approvalDate = today;
+                        inventoryData[index].disapprovalDate = '';
+                        inventoryData[index].disapprovalReason = '';
+                    } else {
+                        const reason = document.getElementById('disapprovalReason').value;
+                        if (!reason) {
+                            alert('Please provide a reason for disapproval');
+                            return;
+                        }
+                        inventoryData[index].approvalStatus = 'disapproved';
+                        inventoryData[index].disapprovalDate = today;
+                        inventoryData[index].disapprovalReason = reason;
+                        inventoryData[index].approvalDate = '';
+                    }
+                    
+                    renderAllTables();
+                    approvalModal.hide();
+                    
+                    // Show success message
+                    alert(`Item ${action === 'approve' ? 'approved' : 'disapproved'} successfully`);
+                }
+            });
+            
+            // Handle restore confirmation
+            confirmRestoreBtn.addEventListener('click', function() {
+                const itemId = parseInt(document.getElementById('restoreItemId').value);
+                const today = new Date().toISOString().split('T')[0];
+                
+                const index = inventoryData.findIndex(item => item.id === itemId);
+                if (index !== -1) {
+                    if (inventoryData[index].disposed) {
+                        // Restoring from disposed status
+                        inventoryData[index].disposed = false;
+                        inventoryData[index].disposalDate = '';
+                        inventoryData[index].disposalReason = '';
+                        inventoryData[index].status = 'Active';
+                    } else {
+                        // Restoring to pending status
+                        inventoryData[index].approvalStatus = 'pending';
+                        inventoryData[index].actionDate = today;
+                        inventoryData[index].approvalDate = '';
+                        inventoryData[index].disapprovalDate = '';
+                        inventoryData[index].disapprovalReason = '';
+                    }
+                    
+                    renderAllTables();
+                    restoreModal.hide();
+                    
+                    // Show success message
+                    alert('Item restored successfully');
+                }
+            });
+            
+            // Handle dispose confirmation
+            confirmDisposeBtn.addEventListener('click', function() {
+                const itemId = parseInt(document.getElementById('disposeItemId').value);
+                const reason = document.getElementById('disposalReason').value;
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (!reason) {
+                    alert('Please provide a reason for disposal');
+                    return;
+                }
+                
+                const index = inventoryData.findIndex(item => item.id === itemId);
+                if (index !== -1) {
+                    inventoryData[index].disposed = true;
+                    inventoryData[index].disposalDate = today;
+                    inventoryData[index].disposalReason = reason;
+                    inventoryData[index].status = 'Disposed';
+                    
+                    renderAllTables();
+                    disposeModal.hide();
+                    
+                    // Show success message
+                    alert('Item disposed successfully');
+                }
+            });
+            
+            // Handle delete confirmation
+            confirmDeleteBtn.addEventListener('click', function() {
+                const itemId = parseInt(document.getElementById('deleteItemId').value);
+                
+                const index = inventoryData.findIndex(item => item.id === itemId);
+                if (index !== -1) {
+                    inventoryData.splice(index, 1);
+                    renderAllTables();
+                    deleteModal.hide();
+                    
+                    // Show success message
+                    alert('Item permanently deleted');
+                }
+            });
+            
+            // Handle search
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm.trim() === '') {
+                    renderAllTables();
+                    return;
+                }
+                
+                const filteredData = inventoryData.filter(item => 
+                    (item.equipmentType.toLowerCase().includes(searchTerm) ||
+                    item.serialNumber.toLowerCase().includes(searchTerm) ||
+                    item.model.toLowerCase().includes(searchTerm) ||
+                    item.brand.toLowerCase().includes(searchTerm) ||
+                    item.department.toLowerCase().includes(searchTerm) ||
+                    item.status.toLowerCase().includes(searchTerm) ||
+                    item.approvalStatus.toLowerCase().includes(searchTerm)) &&
+                    !item.disposed
+                );
+                
+                renderAllTables(filteredData);
+            });
+            
+            // Initialize the tables
+            renderAllTables();
+        });
+    </script>
+</body>
+</html>
